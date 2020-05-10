@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <link rel="icon" href="/img/weather-icon.png"/>
+    <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+
+<body>
+    <div class="main-content">
+        {{>header}}
+        <p>{{message}}</p>
+        {{!-- <img class="main-img" src="/img/throw.png"/> --}}
+        <form>
+            <div class="input-form">
+                <input placeholder="Location">
+                <button>Search</button>
+            </div>  
+        </form>
+        <div class="return-message">
+            <p id="message-1"></p>
+            <p id="message-2"></p>
+        </div>
+    </div>
+    {{>footer}}
+</body>
+
+<script src="/js/app.js"></script>
+</html>
