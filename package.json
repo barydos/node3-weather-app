@@ -1,5 +1,5 @@
 {
-  "name": "web-server",
+  "name": "basic-weather-app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,11 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
-    "hbs": "^4.1.1",
-    "request": "^2.88.2"
+    "express": "4.21.0",
+    "hbs": "4.2.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.3"
+    "nodemon": "3.1.7"
   }
 }
