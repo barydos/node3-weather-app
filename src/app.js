@@ -1,96 +1,94 @@
-const path = require('path')
-const express = require('express')
-const hbs = require('hbs')
-const geocode = require('./utils/geocode')
-const forecast = require('./utils/forecast')
+const path = require("path");
+const express = require("express");
+const hbs = require("hbs");
+const geocode = require("./utils/geocode");
+const forecast = require("./utils/forecast");
 
 // Define paths for Express config
-const publicDirectoryPath = path.join(__dirname,'../public')
-const viewsPath = path.join(__dirname,'../templates/views')
-const partialsPath = path.join(__dirname,'../templates/partials')
+const publicDirectoryPath = path.join(__dirname, "../public");
+const viewsPath = path.join(__dirname, "../templates/views");
+const partialsPath = path.join(__dirname, "../templates/partials");
 
-// Setup Express app 
-const port = process.env.PORT || 3000
-const app = express()
+// Setup Express app
+const port = process.env.PORT || 3000;
+const app = express();
 
 // Setup handlebars engine and views location
-hbs.registerPartials(partialsPath)
-app.set('views', viewsPath)
-app.set('view engine','hbs')
+hbs.registerPartials(partialsPath);
+app.set("views", viewsPath);
+app.set("view engine", "hbs");
 
-app.use(express.static(publicDirectoryPath))
+app.use(express.static(publicDirectoryPath));
 
-app.get('', (req, res) => {
-    res.render('index', {
-        title: "Weather",
-        message: "This website is used to get the weather!",
-        name: "Barry"
-    })
-})
-app.get('/weather', (req, res) => {
-    if (!req.query.address) {
-        return res.send({
-            "error": "Address not provided!"
-        })
-    } 
+app.get("", (req, res) => {
+  res.render("index", {
+    title: "Weather",
+    message: "This website is used to get the weather!",
+    name: "Barry",
+  });
+});
 
-    geocode(req.query.address, (error, { lon:longitude, lat:latitude, location} = {}) => {
-        if (error) {
-            return res.send({ 
-                "error": error
-             })
-            
-        } else {
-            forecast(longitude, latitude, (error, forecastData) => {
-                if (error) {
-                    return res.send( { 
-                        "error": error
-                     } ) 
-                } else {
-                    res.send({
-                        location,
-                        forecast: forecastData,
-                        address: req.query.address
-                    })
-                }
-            })
-        }
-    })
+app.get("/weather", async (req, res) => {
+  if (!req.query.address) {
+    return res.send({
+      error: "Address not provided!",
+    });
+  }
 
-    
-})
+  const geocodeResult = await geocode(req.query.address);
+  const { lon, lat, location, error } = geocodeResult;
 
-app.get('/about', (req, res) => {
-    res.render('about', {
-        title: "About",
-        name: "Barry"
-    })
-})
+  if (error) {
+    return res.send({
+      error: error,
+    });
+  }
 
-app.get('/help', (req, res) => {
-    res.render('help', {
-        title: "Help",
-        errorMessage: "Please Google your problem!",
-        name: "Barry"
-    })
-})
+  const forecastResult = await forecast(lon, lat);
+  if (forecastResult.error) {
+    return res.send({
+      error: forecastResult.error,
+    });
+  }
 
-app.get('/help/*', (req, res) => {
-    res.render('404', {
-        title: "404", 
-        errorMessage: "Help article not found!",
-        name: "Barry"
-    })
-})
+  return res.send({
+    location,
+    forecast: forecastResult.forecast,
+    address: req.query.address,
+  });
+});
 
-app.get('*', (req, res) => {
-    res.render('404', {
-        title: "404",
-        errorMessage: "Page not found!",
-        name: "Barry"
-    })
-})
+app.get("/about", (req, res) => {
+  res.render("about", {
+    title: "About",
+    name: "Barry",
+  });
+});
+
+app.get("/help", (req, res) => {
+  res.render("help", {
+    title: "Help",
+    errorMessage: "Please Google your problem!",
+    name: "Barry",
+  });
+});
+
+app.get("/help/*", (req, res) => {
+  res.render("404", {
+    title: "404",
+    errorMessage: "Help article not found!",
+    name: "Barry",
+  });
+});
+
+app.get("*", (req, res) => {
+  res.render("404", {
+    title: "404",
+    errorMessage: "Page not found!",
+    name: "Barry",
+  });
+});
 
 app.listen(port, () => {
-    console.log("Listening on port " + port)
-})
+  console.log("Listening on port " + port);
+});
